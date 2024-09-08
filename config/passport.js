@@ -21,7 +21,6 @@ module.exports = function (passport) {
 
         try {
           let user = await User.findOne({ googleId: profile.id });
-
           if (user) {
             done(null, user);
           } else {
@@ -35,15 +34,11 @@ module.exports = function (passport) {
     )
   );
 
-  passport.serializeUser(function (user, cb) {
-    process.nextTick(function () {
-      cb(null, { id: user.id, username: user.username, name: user.name });
-    });
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
   });
 
-  passport.deserializeUser(function (user, cb) {
-    process.nextTick(function () {
-      return cb(null, user);
-    });
+  passport.deserializeUser(async (user, done) => {
+    done(null, await User.findById(user.id));
   });
 };
